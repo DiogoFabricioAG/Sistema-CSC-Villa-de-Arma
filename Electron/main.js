@@ -18,27 +18,27 @@ function createWindow() {
 }
 
 function startFlask() {
-  const isWin = process.platform === "win32";
-  const cmd = isWin ? "python" : "python3";
-
-  flaskProcess = spawn(cmd, ["../Backend/app.py"], {
-    cwd: __dirname,
-    env: process.env,
-    shell: true,
-  });
-
-  flaskProcess.stdout.on('data', (data) => {
-    console.log(`[Flask] ${data}`);
-  });
-
-  flaskProcess.stderr.on('data', (data) => {
-    console.error(`[Flask Error] ${data}`);
-  });
-
-  flaskProcess.on('close', (code) => {
-    console.log(`Flask server closed with code ${code}`);
-  });
-}
+    const isWin = process.platform === "win32";
+    const cmd = isWin ? "python" : "python3";
+  
+    flaskProcess = spawn(cmd, ["../Backend/app.py"], {
+      cwd: __dirname,
+      env: process.env,
+      shell: true,
+    });
+  
+    flaskProcess.stdout.on('data', (data) => {
+      console.log(`[Flask] ${data}`);
+    });
+  
+    flaskProcess.stderr.on('data', (data) => {
+      console.error(`[Flask Error] ${data}`);
+    });
+  
+    flaskProcess.on('close', (code) => {
+      console.log(`Flask server closed with code ${code}`);
+    });
+  }
 
 app.whenReady().then(() => {
   startFlask();
