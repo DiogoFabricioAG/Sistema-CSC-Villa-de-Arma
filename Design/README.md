@@ -26,7 +26,7 @@ Desde aquí se puede acceder a todos los módulos del sistema de manera rápida 
 
 ---
 
-## 📸 Ejemplos de Pantallas del Módulo de Asamblea de Socios
+## 📸 Módulo: Asamblea de Socios
 
 Estas son algunas vistas representativas del funcionamiento del módulo de asambleas:
 
@@ -36,8 +36,7 @@ Estas son algunas vistas representativas del funcionamiento del módulo de asamb
 - **Selección de Asamblea Activa**  
   ![Escogiendo Asamblea](images/Asamblea%20de%20Socios%20-%20Escogiendo.png)
 
-
-- **Acta de Reunión en curso**  
+- **Acta de Reunión en Curso**  
   ![Acta de Reunión](images/Asamblea%20de%20Socios%20-%20Acta%20de%20Reunion.png)
 
 - **Lista de Asistentes Registrados**  
@@ -45,4 +44,40 @@ Estas son algunas vistas representativas del funcionamiento del módulo de asamb
 
 ---
 
-Este diseño busca mantener una experiencia sencilla, clara y eficiente para los operadores del sistema, priorizando la **organización**, el **control de información** y la **usabilidad**.
+## 📸 Módulo: Padrón de Socios
+
+Vistas correspondientes al registro, filtro y consulta de socios:
+
+- **Listado de Socios**  
+  ![Listado de Socios](images/Padron%20de%20Socios%20-%20Lista%20de%20Socios.png)
+
+- **Registro de un Nuevo Socio**  
+  ![Registro Socio](images/Padron%20de%20Socios%20-%20Registro.png)
+
+- **Filtrado de Socios**  
+  ![Filtro Socios](images/Padron%20de%20Socios%20-%20Filtro%20de%20Socios.png)
+
+---
+
+## 📸 Módulo: Deudas de Socios
+
+Visualización de deudas, pagos, y gráficas del historial económico:
+
+- **Creación de Nueva Deuda**  
+  ![Crear Deuda](images/Deudas%20de%20Socios%20-%20Crear%20Deuda.png)
+
+- **Gráfica de Deuda del Socio**  
+  ![Gráfica Deuda](images/Deudas%20de%20Socios%20-%20Grafica%20de%20Deuda.png)
+
+- **Saldar Deuda Existente**  
+  ![Saldar Deuda](images/Deudas%20de%20Socios%20-%20Saldar%20Deuda.png)
+
+- **Seleccionar Socio para Visualizar Deudas**  
+  ![Seleccionar Socio](images/Deudas%20de%20Socios%20-%20Seleccionar%20Socio.png)
+
+- **Vista Sin Socio Seleccionado**  
+  ![Sin Socio Seleccionado](images/Deudas%20de%20Socios%20-%20Sin%20Escoger.png)
+
+---
+
+Este diseño busca mantener una experiencia **sencilla**, **clara** y **eficiente** para los operadores del sistema, priorizando la **organización**, el **control de información** y la **usabilidad**.
