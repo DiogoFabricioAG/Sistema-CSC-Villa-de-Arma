@@ -11,6 +11,11 @@ const routes = [
     path: '/about',
     name: 'About',
     component: () => import('../pages/About.vue') // Lazy loading
+  },
+  {
+    path: '/census',
+    name: 'census',
+    component: () => import('../pages/Padron/Census.vue')
   }
 ]
 

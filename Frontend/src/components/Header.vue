@@ -1,5 +1,5 @@
 <template>
-  <header class="bg-gray-800 text-white justify-center flex p-4">
+  <header class="bg-gray-800 text-white justify-center flex p-4 shadow-md">
     <div class="flex items-center h-16">
       <img
         src="../assets/Logo CSC Villa de Arma.png"

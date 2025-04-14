@@ -12,10 +12,14 @@ defineProps({
     type: String,
     required: true,
   },
+  to: {
+    type: String,
+    required: true,
+  },
 });
 </script>
 <template>
-  <router-link class="w-[60%]" to="">
+  <router-link class="w-[60%]" :to="{ name: to }">
     <div
       class="flex items-center duration-150 rounded-md border-2 border-black gap-2 p-4 cursor-pointer"
       :class="
