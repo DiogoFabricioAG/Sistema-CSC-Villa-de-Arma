@@ -16,7 +16,17 @@ const routes = [
     path: '/census',
     name: 'census',
     component: () => import('../pages/Padron/Census.vue')
-  }
+  },
+  {
+    path: '/assembly',
+    name: 'assembly',
+    component: () => import('../pages/Asamblea/Assemblies.vue')
+  },
+  {
+    path: '/debt',
+    name: 'debt',
+    component: () => import('../pages/Deudas/Debts.vue')
+  },
 ]
 
 const router = createRouter({

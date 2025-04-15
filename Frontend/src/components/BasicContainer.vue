@@ -8,7 +8,7 @@ defineProps({
 </script>
 <template>
   <div
-    class="rounded-md border-2 p-2 items-center shadow-md flex flex-col gap-5 border-black"
+    class="rounded-xl border-2 p-2 items-center shadow-md flex flex-col gap-5 border-black"
     :class="
       containerType === 'full'
         ? 'w-full'
@@ -20,6 +20,8 @@ defineProps({
         ? 'lg:w-1/2 w-full'
         : containerType === '1fourth'
         ? 'lg:w-1/4 w-full'
+        : containerType === '3fourth'
+        ? 'lg:w-3/4 w-full'
         : ''
     "
   >
