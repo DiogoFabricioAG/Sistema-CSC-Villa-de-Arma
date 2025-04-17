@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { defineProps } from "vue";
 import User from "./icons/User.vue";
 import Assembly from "./icons/Assembly.vue";
 import Tag from "./icons/Tag.vue";
