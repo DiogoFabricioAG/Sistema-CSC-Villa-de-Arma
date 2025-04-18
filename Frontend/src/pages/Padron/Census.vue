@@ -8,18 +8,40 @@ import MayorContainer from "../../components/MayorContainer.vue";
 import DialogComponent from "../../components/DialogComponent.vue";
 import DialogContainer from "../../components/DialogContainer.vue";
 import BasicCheckbox from "../../components/BasicCheckbox.vue";
+import { useMyToastStore } from "../../stores/Toast";
 
 const optionSelected = ref(-1);
 
+const isOpen = ref(false);
+const isCheck = ref(false);
+const dialogOptions = ref(0);
 const handleChange = (value: number) => {
   optionSelected.value = value;
 };
-
-const isOpen = ref(false);
-const isCheck = ref(false);
-const handleOpen = () => {
+const handleOpen = (dialogOption: number) => {
   isOpen.value = isOpen.value ? false : true;
   console.log(isOpen.value);
+  if (dialogOption !== undefined) {
+    dialogOptions.value = dialogOption;
+  }
+};
+const myItemFile = ref<File | null>(null);
+const toastStore = useMyToastStore();
+
+const handleFileUpload = (event: Event) => {
+  const fileInput = event.target as HTMLInputElement;
+  const file = fileInput.files?.[0];
+  if (file) {
+    myItemFile.value = file;
+
+    // Create a new Blob and trigger download
+    const blob = new Blob([file], { type: file.type });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `new_${file.name}`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  }
 };
 </script>
 <template>
@@ -30,9 +52,14 @@ const handleOpen = () => {
         Padrón de Socios
       </p>
       <div class="flex flex-col justify-center gap-2">
-        <BasicButton text="Filtrar Socios" @click="handleOpen()" />
-        <BasicButton text="Limpiar Filtros" @click="console.log(1)" />
-        <BasicButton text="Actualizar Datos" @click="console.log(1)" />
+        <BasicButton text="Filtrar Socios" @click="handleOpen(0)" />
+        <BasicButton
+          text="Limpiar Filtros"
+          @click="
+            toastStore.showToast(500, 'Se limpiaron los Archivos', 'alert')
+          "
+        />
+        <BasicButton text="Actualizar Datos" @click="handleOpen(1)" />
       </div>
       <p>Cantidad de Socios: 1900</p>
     </BasicContainer>
@@ -148,7 +175,7 @@ const handleOpen = () => {
             />
           </div>
 
-          <BasicButton text="Crear Socio" @click="handleOpen()" />
+          <BasicButton text="Crear Socio" @click="handleOpen(0)" />
         </div>
         <div
           class="absolute top-[40%] left-[27.5%] font-primary text-2xl font-lg"
@@ -158,11 +185,8 @@ const handleOpen = () => {
         </div>
       </section>
     </BasicContainer>
-    <DialogComponent :is-open="isOpen" @close="handleOpen">
-      <DialogContainer>
-        <h2 class="font-primary text-xl text-center font-semibold">
-          Filtro de Socios
-        </h2>
+    <DialogComponent :is-open="isOpen" @close="handleOpen(0)">
+      <DialogContainer title="Filtro de Socios" v-if="dialogOptions === 0">
         <div class="text-sm font-primary mt-2 space-y-2">
           <div class="flex justify-between gap-2 mx-auto">
             <input
@@ -186,6 +210,26 @@ const handleOpen = () => {
           >
             <BasicCheckbox :is-open="isCheck" />
             <label for="active">Activo</label>
+          </div>
+        </div>
+      </DialogContainer>
+      <DialogContainer title="Cargar Archivos" v-if="dialogOptions === 1">
+        <div class="text-sm font-primary font-light mt-2 space-y-2">
+          <label>
+            <input type="file" hidden @change="handleFileUpload" />
+            <div
+              class="flex h-9 font-primary px-2 mb-2 hover:bg-gray-100 duration-150 flex-col border border-black text-black text-sm items-center justify-center cursor-pointer focus:outline-none"
+            >
+              Seleccionar Archivo
+            </div>
+          </label>
+          <div>
+            <p class="text-sm font-bold">No cuentas con el Formato?</p>
+            <button
+              class="flex h-9 w-full font-primary mt-2 px-2 flex-col border hover:bg-red-300 duration-150 bg-red-200 border-black text-black text-sm items-center justify-center cursor-pointer focus:outline-none"
+            >
+              Seleccionar Archivo
+            </button>
           </div>
         </div>
       </DialogContainer>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Header from "./components/Header.vue";
+import BasicToast from "./components/BasicToast.vue";
 </script>
 
 <template>
@@ -11,6 +12,7 @@ import Header from "./components/Header.vue";
       </transition>
     </router-view>
   </div>
+  <BasicToast />
 </template>
 <style>
 .fade-enter-active,
