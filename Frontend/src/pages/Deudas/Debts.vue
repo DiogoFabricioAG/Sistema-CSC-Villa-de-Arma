@@ -5,6 +5,7 @@ import BasicContainer from "../../components/BasicContainer.vue";
 import BasicToggle from "../../components/BasicToggle.vue";
 import Tag from "../../components/icons/Tag.vue";
 import MayorContainer from "../../components/MayorContainer.vue";
+import ImageContainer from "../../components/ImageContainer.vue";
 
 const optionSelected = ref(-1);
 
@@ -40,6 +41,14 @@ const handleChange = (value: number) => {
           @click="handleChange(1)"
         />
       </div>
+      <section class="w-full p-10 h-full relative">
+        <div
+          v-if="optionSelected == 0"
+          class="mx-auto text-sm flex justify-center"
+        >
+          <ImageContainer id-image="1RrH6qE4jhPIPmIhN45yicV0ldB93rNom" />
+        </div>
+      </section>
     </BasicContainer>
   </MayorContainer>
 </template>
