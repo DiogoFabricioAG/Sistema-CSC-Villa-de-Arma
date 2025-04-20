@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import BasicButton from "../../components/BasicButton.vue";
 import BasicContainer from "../../components/BasicContainer.vue";
 import BasicToggle from "../../components/BasicToggle.vue";
@@ -9,6 +9,8 @@ import DialogComponent from "../../components/DialogComponent.vue";
 import DialogContainer from "../../components/DialogContainer.vue";
 import BasicCheckbox from "../../components/BasicCheckbox.vue";
 import { useMyToastStore } from "../../stores/Toast";
+import { postSocios, getSocios } from "../../services/sociosServices";
+import type { SocioResponse } from "../../types/sociosTypes";
 
 const optionSelected = ref(-1);
 
@@ -18,6 +20,26 @@ const dialogOptions = ref(0);
 const handleChange = (value: number) => {
   optionSelected.value = value;
 };
+const socioData = ref({
+  nombre: "",
+  apellido: "",
+  categoria: "",
+  celular: "",
+  correo_electronico: "",
+});
+
+const handleCreate = async () => {
+  postSocios(socioData.value)
+    .then((response) => {
+      console.log(response);
+      toastStore.showToast(500, "Socio creado correctamente", "check");
+    })
+    .catch((error) => {
+      console.error(error);
+      toastStore.showToast(500, "Error al crear el socio", "wrong");
+    });
+};
+
 const handleOpen = (dialogOption: number) => {
   isOpen.value = isOpen.value ? false : true;
   console.log(isOpen.value);
@@ -43,6 +65,48 @@ const handleFileUpload = (event: Event) => {
     URL.revokeObjectURL(link.href);
   }
 };
+
+const sociosResponse = ref<SocioResponse[]>([]);
+const filtros = ref({
+  fecha_inicio: "",
+  fecha_fin: "",
+  categoria: "",
+});
+
+const filteredData = computed(() => {
+  return sociosResponse.value.filter((socio) => {
+    const fechaIngreso = new Date(socio.fecha_ingreso);
+    const fechaInicio = new Date(filtros.value.fecha_inicio);
+    const fechaFin = new Date(filtros.value.fecha_fin);
+
+    return (
+      (!filtros.value.fecha_inicio || fechaIngreso >= fechaInicio) &&
+      (!filtros.value.fecha_fin || fechaIngreso <= fechaFin) &&
+      (!filtros.value.categoria ||
+        socio.categoria
+          .toLowerCase()
+          .includes(filtros.value.categoria.toLowerCase()))
+    );
+  });
+});
+const handleClean = () => {
+  filtros.value.fecha_inicio = "";
+  filtros.value.fecha_fin = "";
+  filtros.value.categoria = "";
+  isCheck.value = false;
+  toastStore.showToast(500, "Se limpiaron los Filtros", "alert");
+};
+
+onMounted(() => {
+  getSocios()
+    .then((response) => {
+      console.log(response);
+      sociosResponse.value = response;
+    })
+    .catch((error) => {
+      console.error("Error fetching socios:", error);
+    });
+});
 </script>
 <template>
   <MayorContainer>
@@ -53,12 +117,7 @@ const handleFileUpload = (event: Event) => {
       </p>
       <div class="flex flex-col justify-center gap-2">
         <BasicButton text="Filtrar Socios" @click="handleOpen(0)" />
-        <BasicButton
-          text="Limpiar Filtros"
-          @click="
-            toastStore.showToast(500, 'Se limpiaron los Archivos', 'alert')
-          "
-        />
+        <BasicButton text="Limpiar Filtros" @click="handleClean" />
         <BasicButton text="Actualizar Datos" @click="handleOpen(1)" />
       </div>
       <p>Cantidad de Socios: 1900</p>
@@ -90,56 +149,32 @@ const handleFileUpload = (event: Event) => {
                 <th class="border-black border p-2">Apellido</th>
                 <th class="border-black border p-2">N° Celular</th>
                 <th class="border-black border p-2">Categoría</th>
+                <th class="border-black border p-2">Fecha de Ingreso</th>
                 <th class="border-black border p-2">Correo Electronico</th>
               </tr>
             </thead>
             <tbody class="bg-white text-black">
-              <tr class="hover:bg-red-100 duration-150 cursor-pointer">
-                <td class="border-black border p-2">Juan</td>
-                <td class="border-black border p-2">Pérez</td>
-                <td class="border-black border p-2">12345678</td>
-                <td class="border-black border p-2">01/01/1990</td>
-                <td class="border-black border p-2">diogo.abregu.g@uni.pe</td>
-              </tr>
-              <tr class="hover:bg-red-100 duration-150 cursor-pointer">
-                <td class="border-black border p-2">María</td>
-                <td class="border-black border p-2">Gómez</td>
-                <td class="border-black border p-2">87654321</td>
-                <td class="border-black border p-2">02/02/1985</td>
-                <td class="border-black border p-2">diogo.abregu.g@uni.pe</td>
-              </tr>
-              <tr class="hover:bg-red-100 duration-150 cursor-pointer">
-                <td class="border-black border p-2">Juan</td>
-                <td class="border-black border p-2">Pérez</td>
-                <td class="border-black border p-2">12345678</td>
-                <td class="border-black border p-2">01/01/1990</td>
-                <td class="border-black border p-2">diogo.abregu.g@uni.pe</td>
-              </tr>
-              <tr class="hover:bg-red-100 duration-150 cursor-pointer">
-                <td class="border-black border p-2">María</td>
-                <td class="border-black border p-2">Gómez</td>
-                <td class="border-black border p-2">87654321</td>
-                <td class="border-black border p-2">02/02/1985</td>
-                <td class="border-black border p-2">diogo.abregu.g@uni.pe</td>
-              </tr>
-              <tr class="hover:bg-red-100 duration-150 cursor-pointer">
-                <td class="border-black border p-2">Juan</td>
-                <td class="border-black border p-2">Pérez</td>
-                <td class="border-black border p-2">12345678</td>
-                <td class="border-black border p-2">01/01/1990</td>
-                <td class="border-black border p-2">diogo.abregu.g@uni.pe</td>
-              </tr>
-              <tr class="hover:bg-red-100 duration-150 cursor-pointer">
-                <td class="border-black border p-2">María</td>
-                <td class="border-black border p-2">Gómez</td>
-                <td class="border-black border p-2">87654321</td>
-                <td class="border-black border p-2">02/02/1985</td>
-                <td class="border-black border p-2">diogo.abregu.g@uni.pe</td>
+              <tr
+                v-for="(item, index) in filteredData"
+                :key="index"
+                class="hover:bg-red-100 duration-150 cursor-pointer"
+              >
+                <td class="border-black border p-2">{{ item.nombre }}</td>
+                <td class="border-black border p-2">{{ item.apellido }}</td>
+                <td class="border-black border p-2">{{ item.celular }}</td>
+                <td class="border-black border p-2">{{ item.categoria }}</td>
+                <td class="border-black border p-2">
+                  {{ item.fecha_ingreso }}
+                </td>
+                <td class="border-black border p-2">
+                  {{ item.correo_electronico }}
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div
+        <form
+          @submit="handleCreate()"
           v-else-if="optionSelected == 1"
           class="font-primary font-light w-full flex flex-col h-full gap-4 justify-between text-lg"
         >
@@ -149,11 +184,13 @@ const handleFileUpload = (event: Event) => {
                 class="p-2 border w-1/2 border-black focus:scale-105 focus:outline-red-500 duration-150"
                 type="text"
                 placeholder="Nombre del Socio"
+                v-model="socioData.nombre"
               />
               <input
                 class="p-2 border w-1/2 border-black focus:scale-105 focus:outline-red-500 duration-150"
                 type="text"
                 placeholder="Apellido del Socio"
+                v-model="socioData.apellido"
               />
             </div>
             <div class="flex gap-4">
@@ -161,22 +198,25 @@ const handleFileUpload = (event: Event) => {
                 class="p-2 border w-1/2 border-black focus:scale-105 focus:outline-red-500 duration-150"
                 type="text"
                 placeholder="Categoria del Socio"
+                v-model="socioData.categoria"
               />
               <input
                 class="p-2 border w-1/2 border-black focus:scale-105 focus:outline-red-500 duration-150"
                 type="text"
                 placeholder="Numero del Socio"
+                v-model="socioData.celular"
               />
             </div>
             <input
               class="p-2 border w-full border-black focus:scale-105 focus:outline-red-500 duration-150"
               type="text"
               placeholder="Dirección de Correo Electrónico"
+              v-model="socioData.correo_electronico"
             />
           </div>
 
-          <BasicButton text="Crear Socio" @click="handleOpen(0)" />
-        </div>
+          <BasicButton text="Crear Socio" />
+        </form>
         <div
           class="absolute top-[40%] left-[27.5%] font-primary text-2xl font-lg"
           v-else
@@ -193,17 +233,20 @@ const handleFileUpload = (event: Event) => {
               type="date"
               class="w-1/2 border border-black rounded-sm p-1"
               placeholder="Fecha de Inicio"
+              v-model="filtros.fecha_inicio"
             />
             <input
               type="date"
               class="w-1/2 border border-black rounded-sm p-1"
               placeholder="Fecha de Fin"
+              v-model="filtros.fecha_fin"
             />
           </div>
           <input
             class="p-2 border w-full border-black focus:scale-105 focus:outline-red-500 duration-150"
             type="text"
             placeholder="Categoria del Socio"
+            v-model="filtros.categoria"
           />
           <div
             class="flex gap-2 mt-2 font-primary font-light justify-center items-center"
@@ -228,7 +271,7 @@ const handleFileUpload = (event: Event) => {
             <button
               class="flex h-9 w-full font-primary mt-2 px-2 flex-col border hover:bg-red-300 duration-150 bg-red-200 border-black text-black text-sm items-center justify-center cursor-pointer focus:outline-none"
             >
-              Seleccionar Archivo
+              Descargar Formato
             </button>
           </div>
         </div>

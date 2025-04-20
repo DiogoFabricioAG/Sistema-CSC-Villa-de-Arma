@@ -7,7 +7,6 @@ import Tag from "../../components/icons/Tag.vue";
 import MayorContainer from "../../components/MayorContainer.vue";
 import DialogComponent from "../../components/DialogComponent.vue";
 import DialogContainer from "../../components/DialogContainer.vue";
-import BasicCheckbox from "../../components/BasicCheckbox.vue";
 import { useMyToastStore } from "../../stores/Toast";
 
 const optionSelected = ref(-1);

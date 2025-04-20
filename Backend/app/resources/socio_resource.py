@@ -10,7 +10,6 @@ parser.add_argument("apellido", type=str, required=True)
 parser.add_argument("celular", type=str, required=True)
 parser.add_argument("correo_electronico", type=str, required=True)
 parser.add_argument("categoria", type=str, required=True)
-parser.add_argument("fecha_ingreso", type=str, required=True)
 
 class SocioResource(Resource):
     def get(self):
@@ -30,7 +29,7 @@ class SocioResource(Resource):
 
     def post(self):
         args = parser.parse_args()
-        fecha_ingreso = datetime.strptime(args["fecha_ingreso"], "%d/%m/%Y").date()
+        fecha_ingreso = datetime.now().date()
 
         nuevo = Socio(
             nombre=args["nombre"],

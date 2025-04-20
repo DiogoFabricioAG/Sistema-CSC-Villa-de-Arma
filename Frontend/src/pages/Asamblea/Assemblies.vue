@@ -89,39 +89,23 @@ const handleOpen = (value: number) => {
             <thead class="bg-blue-200 border border-black">
               <tr>
                 <th class="border border-black p-2">Fecha</th>
-                <th class="border border-black p-2">Acción</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="border border-black">
+              <tr
+                class="border hover:bg-blue-100 duration-150 cursor-pointer border-black"
+              >
                 <td class="border border-black p-2">14/04/2025</td>
-                <td class="border border-black p-2">
-                  <button
-                    class="bg-blue-100 border border-black p-1 rounded-sm cursor-pointer hover:bg-blue-200 duration-150"
-                  >
-                    Seleccionar
-                  </button>
-                </td>
               </tr>
-              <tr class="border border-black">
+              <tr
+                class="border hover:bg-blue-100 duration-150 cursor-pointer border-black"
+              >
                 <td class="border border-black p-2">14/04/2025</td>
-                <td class="border border-black p-2">
-                  <button
-                    class="bg-blue-100 border border-black p-1 rounded-sm cursor-pointer hover:bg-blue-200 duration-150"
-                  >
-                    Seleccionar
-                  </button>
-                </td>
               </tr>
-              <tr class="border border-black">
+              <tr
+                class="border hover:bg-blue-100 duration-150 cursor-pointer border-black"
+              >
                 <td class="border border-black p-2">14/04/2025</td>
-                <td class="border border-black p-2">
-                  <button
-                    class="bg-blue-100 border border-black p-1 rounded-sm cursor-pointer hover:bg-blue-200 duration-150"
-                  >
-                    Seleccionar
-                  </button>
-                </td>
               </tr>
             </tbody>
           </table>
