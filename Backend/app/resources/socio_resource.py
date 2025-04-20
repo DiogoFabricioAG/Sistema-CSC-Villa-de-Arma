@@ -2,7 +2,7 @@ from flask_restful import Resource, reqparse
 from app.models.socio import Socio
 from app.extensions import db
 from datetime import datetime
-
+from app.services.opinion_service import obtener_opiniones
 # Actualizamos el parser para incluir los nuevos campos del modelo
 parser = reqparse.RequestParser()
 parser.add_argument("nombre", type=str, required=True)
@@ -43,3 +43,17 @@ class SocioResource(Resource):
         db.session.add(nuevo)
         db.session.commit()
         return {"message": "Socio creado", "id": nuevo.id}, 201
+    
+class OpinionResource(Resource):
+    def get(self):
+        opinions = obtener_opiniones(spreadsheet_id='1zHliU1yGnbmIIG0PcJBeKqr0kPH6FbvMaiASBdeuKUI', sheet_name='QuejasOpinionesCSCVilladeArma')
+        
+        # Format the response as JSON
+        response = {
+            "status": "success",
+            "message": "Opiniones obtenidas con éxito",
+            "data": opinions,
+            "total": len(opinions) if isinstance(opinions, list) else 0
+        }
+        
+        return response, 200
