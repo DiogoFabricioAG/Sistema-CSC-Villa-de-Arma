@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import BasicButton from "../../components/BasicButton.vue";
 import BasicContainer from "../../components/BasicContainer.vue";
 import BasicToggle from "../../components/BasicToggle.vue";
@@ -9,20 +9,60 @@ import ImageContainer from "../../components/ImageContainer.vue";
 import DialogContainer from "../../components/DialogContainer.vue";
 import DialogComponent from "../../components/DialogComponent.vue";
 import { useMyToastStore } from "../../stores/Toast";
+import { getAsambleas, loadAsambleas } from "../../services/asambleaServices";
 
 const optionSelected = ref(-1);
 
 const handleChange = (value: number) => {
+  if (AsambleaSeleccionada.value.fecha_asamblea === "") {
+    toastStore.showToast(500, "Seleccione una asamblea", "wrong");
+    return;
+  }
   optionSelected.value = value;
 };
 const toastStore = useMyToastStore();
 
 const isOpen = ref(false);
 const dialogOptions = ref(0);
-const isCheck = ref(false);
+const AsambleaSeleccionada = ref({
+  fecha_asamblea: "",
+  asistentes_asamblea: "",
+  acta_asamblea: "",
+});
+
 const handleOpen = (value: number) => {
   isOpen.value = !isOpen.value;
+
   dialogOptions.value = value;
+};
+const asambleasTotal = ref(null);
+
+onMounted(() => {
+  getAsambleas()
+    .then((response) => {
+      asambleasTotal.value = response;
+    })
+    .catch((error) => {
+      console.error("Error fetching asambleas:", error);
+    });
+});
+
+const handleSelectAsamblea = (asamblea: any) => {
+  AsambleaSeleccionada.value = asamblea;
+  isOpen.value = false;
+  toastStore.showToast(500, "Asamblea seleccionada correctamente", "check");
+};
+const handleLoadAsambleas = () => {
+  loadAsambleas();
+  getAsambleas()
+    .then((response) => {
+      asambleasTotal.value = response.data;
+    })
+    .catch((error) => {
+      console.error("Error fetching asambleas:", error);
+    });
+  toastStore.showToast(500, "Asambleas cargadas correctamente", "check");
+  isOpen.value = false;
 };
 </script>
 <template>
@@ -58,13 +98,15 @@ const handleOpen = (value: number) => {
           v-if="optionSelected == 0"
           class="mx-auto text-sm flex justify-center"
         >
-          <ImageContainer id-image="1RrH6qE4jhPIPmIhN45yicV0ldB93rNom" />
+          <ImageContainer
+            :id-image="AsambleaSeleccionada.asistentes_asamblea"
+          />
         </div>
         <div
           v-if="optionSelected == 1"
           class="mx-auto text-sm flex justify-center"
         >
-          <ImageContainer id-image="1RrH6qE4jhPIPmIhN45yicV0ldB93rNom" />
+          <ImageContainer :id-image="AsambleaSeleccionada.acta_asamblea" />
         </div>
       </section>
     </BasicContainer>
@@ -93,19 +135,16 @@ const handleOpen = (value: number) => {
             </thead>
             <tbody>
               <tr
+                v-for="(asamblea, index) in asambleasTotal"
+                :key="index"
                 class="border hover:bg-blue-100 duration-150 cursor-pointer border-black"
               >
-                <td class="border border-black p-2">14/04/2025</td>
-              </tr>
-              <tr
-                class="border hover:bg-blue-100 duration-150 cursor-pointer border-black"
-              >
-                <td class="border border-black p-2">14/04/2025</td>
-              </tr>
-              <tr
-                class="border hover:bg-blue-100 duration-150 cursor-pointer border-black"
-              >
-                <td class="border border-black p-2">14/04/2025</td>
+                <td
+                  @click="handleSelectAsamblea(asamblea)"
+                  class="border border-black p-2"
+                >
+                  {{ asamblea.fecha_asamblea }}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -123,15 +162,7 @@ const handleOpen = (value: number) => {
             </p>
           </div>
 
-          <BasicButton
-            text="Cargar Datos"
-            @click="
-              () => {
-                toastStore.showToast(500, 'Cargado Correctamente', 'check');
-                isOpen = false;
-              }
-            "
-          />
+          <BasicButton text="Cargar Datos" @click="handleLoadAsambleas()" />
         </div>
       </DialogContainer>
     </DialogComponent>

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { SocioRequest, export SocioResponse } from '../types/sociosTypes';
+import type { SocioRequest, SocioResponse } from '../types/sociosTypes';
 
 export const getSocios = async (): Promise<SocioResponse[]> => {
     return await axios.get('api/socios')
