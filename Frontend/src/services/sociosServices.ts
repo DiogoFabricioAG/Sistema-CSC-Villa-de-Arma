@@ -21,3 +21,13 @@ export const postSocios = async (data: SocioRequest) => {
             console.log(error);
         })
 }
+
+export const loadSocios = async () => {
+    return await axios.post('api/socios/google')
+        .then((response) => {
+            console.log(response.data);
+        })
+        .catch(error => {
+            console.log(error);
+        })
+}

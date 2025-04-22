@@ -9,7 +9,11 @@ import DialogComponent from "../../components/DialogComponent.vue";
 import DialogContainer from "../../components/DialogContainer.vue";
 import BasicCheckbox from "../../components/BasicCheckbox.vue";
 import { useMyToastStore } from "../../stores/Toast";
-import { postSocios, getSocios } from "../../services/sociosServices";
+import {
+  postSocios,
+  getSocios,
+  loadSocios,
+} from "../../services/sociosServices";
 import type { SocioResponse } from "../../types/sociosTypes";
 
 const optionSelected = ref(-1);
@@ -38,6 +42,27 @@ const handleCreate = async () => {
       console.error(error);
       toastStore.showToast(500, "Error al crear el socio", "wrong");
     });
+};
+
+const handleLoadSocios = () => {
+  loadSocios()
+    .then((response) => {
+      console.log(response);
+      toastStore.showToast(500, "Datos cargados correctamente", "check");
+      getSocios()
+        .then((response) => {
+          console.log(response);
+          sociosResponse.value = response;
+        })
+        .catch((error) => {
+          console.error("Error fetching socios:", error);
+        });
+    })
+    .catch((error) => {
+      console.error(error);
+      toastStore.showToast(500, "Error al cargar los datos", "wrong");
+    });
+  handleOpen(0);
 };
 
 const handleOpen = (dialogOption: number) => {
@@ -256,24 +281,16 @@ onMounted(() => {
           </div>
         </div>
       </DialogContainer>
-      <DialogContainer title="Cargar Archivos" v-if="dialogOptions === 1">
-        <div class="text-sm font-primary font-light mt-2 space-y-2">
-          <label>
-            <input type="file" hidden @change="handleFileUpload" />
-            <div
-              class="flex h-9 font-primary px-2 mb-2 hover:bg-gray-100 duration-150 flex-col border border-black text-black text-sm items-center justify-center cursor-pointer focus:outline-none"
-            >
-              Seleccionar Archivo
-            </div>
-          </label>
+      <DialogContainer title="Cargar datos" v-if="dialogOptions === 1">
+        <div class="text-sm font-primary font-light mt-2 space-y-3">
           <div>
-            <p class="text-sm font-bold">No cuentas con el Formato?</p>
-            <button
-              class="flex h-9 w-full font-primary mt-2 px-2 flex-col border hover:bg-red-300 duration-150 bg-red-200 border-black text-black text-sm items-center justify-center cursor-pointer focus:outline-none"
-            >
-              Descargar Formato
-            </button>
+            <p>¿Seguro de cargar los datos de la asamblea?</p>
+            <p class="text-xs">
+              Ultima vez cargado: <span class="font-bold">29/04/2025</span>
+            </p>
           </div>
+
+          <BasicButton text="Cargar Datos" @click="handleLoadSocios()" />
         </div>
       </DialogContainer>
     </DialogComponent>

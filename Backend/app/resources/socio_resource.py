@@ -2,7 +2,7 @@ from flask_restful import Resource, reqparse
 from app.models.socio import Socio
 from app.extensions import db
 from datetime import datetime
-from app.services.opinion_service import obtener_opiniones
+from app.services.google_workspace import obtener_datos
 # Actualizamos el parser para incluir los nuevos campos del modelo
 parser = reqparse.RequestParser()
 parser.add_argument("nombre", type=str, required=True)
@@ -45,7 +45,7 @@ class SocioResource(Resource):
     
 class OpinionResource(Resource):
     def get(self):
-        opinions = obtener_opiniones(spreadsheet_id='1zHliU1yGnbmIIG0PcJBeKqr0kPH6FbvMaiASBdeuKUI', sheet_name='QuejasOpinionesCSCVilladeArma')
+        opinions = obtener_datos(spreadsheet_id='1zHliU1yGnbmIIG0PcJBeKqr0kPH6FbvMaiASBdeuKUI', sheet_name='QuejasOpinionesCSCVilladeArma')
         
         # Format the response as JSON
         response = {
@@ -56,3 +56,29 @@ class OpinionResource(Resource):
         }
         
         return response, 200
+
+class SocioGoogleResource(Resource):
+    def post(self):
+        dataSocios = obtener_datos(spreadsheet_id='1DS-iwBMSHMiJhL-6rKH7UVUMKtNFkGP2ioPFlt7V1yw', sheet_name='Socios CSC Villa de Arma')
+        for i in dataSocios:
+            if i["Nombre"] == "":
+                return {"message": "No se puede crear un socio sin nombre"}, 400
+
+            # Verificar si el socio ya existe en la base de datos
+            socio_existente = Socio.query.filter_by(correo_electronico=i["Email"]).first()
+            if socio_existente:
+                pass
+            else:
+                nuevo = Socio(
+                    nombre=i["Nombre"],
+                    apellido=i["Apellido"],
+                    celular=i["Numero"],
+                    correo_electronico=i["Email"],
+                    categoria=i["Categoria"],
+                    fecha_ingreso=datetime.strptime(i["Marca temporal"], "%d/%m/%Y %H:%M:%S").date()
+                )
+                
+                db.session.add(nuevo)
+        # Commit the session to save the new assembly
+        db.session.commit()
+        return {"message": "Socios creados"}, 201

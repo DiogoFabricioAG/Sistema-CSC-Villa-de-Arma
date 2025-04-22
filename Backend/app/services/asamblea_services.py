@@ -14,3 +14,9 @@ def get_image_id(image):
     return image.split("=")[1]
 
 # print(get_image_id('https://drive.google.com/open?id=1guQofGXvcprpJ2kW8QoqeABicAKu1iks')) # 1guQofGXvcprpJ2kW8QoqeABicAKu1iks
+
+def give_format(date):
+    y,m,d = date.split("-")
+
+    return f"{d}/{m}/{y}"
+print(give_format("2023-10-01")) # 01/10/2023

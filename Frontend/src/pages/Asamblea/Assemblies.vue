@@ -76,7 +76,10 @@ const handleLoadAsambleas = () => {
         <BasicButton text="Seleccionar Asamblea" @click="handleOpen(0)" />
         <BasicButton text="Cargar Asamblea" @click="handleOpen(1)" />
       </div>
-      <p>Fecha de Asamblea: 14/04/2025</p>
+      <p v-if="AsambleaSeleccionada.fecha_asamblea == ''">
+        Escoge alguna Asamblea
+      </p>
+      <p v-else>Fecha de Asamblea: {{ AsambleaSeleccionada.fecha_asamblea }}</p>
     </BasicContainer>
     <BasicContainer container-type="3fourth">
       <div class="flex justify-between w-2/3 gap-2 mt-2">
