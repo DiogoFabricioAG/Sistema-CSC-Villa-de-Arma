@@ -1,5 +1,5 @@
 from app.extensions import db
-
+import json
 class Socio(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(100), nullable=False)
@@ -10,4 +10,12 @@ class Socio(db.Model):
     fecha_ingreso = db.Column(db.Date)
 
     def __repr__(self):
-        return f"<Socio {self.nombre} {self.apellido}>"
+        return json.dumps({
+            "id": self.id,
+            "nombre": self.nombre,
+            "apellido": self.apellido,
+            "celular": self.celular,
+            "correo_electronico": self.correo_electronico,
+            "categoria": self.categoria,
+            "fecha_ingreso": str(self.fecha_ingreso),
+        })

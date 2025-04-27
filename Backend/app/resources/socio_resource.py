@@ -82,3 +82,19 @@ class SocioGoogleResource(Resource):
         # Commit the session to save the new assembly
         db.session.commit()
         return {"message": "Socios creados"}, 201
+    
+class SocioDetailResource(Resource):
+    def get(self, id):
+        socio = Socio.query.get(id)
+        if not socio:
+            return {"message": "Socio no encontrado"}, 404
+        
+        return {
+            "id": socio.id,
+            "nombre": socio.nombre,
+            "apellido": socio.apellido,
+            "celular": socio.celular,
+            "correo_electronico": socio.correo_electronico,
+            "categoria": socio.categoria,
+            "fecha_ingreso": str(socio.fecha_ingreso),
+        }

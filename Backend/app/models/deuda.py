@@ -23,12 +23,11 @@ class HistorialPago(db.Model):
     __tablename__ = 'historial_pagos'
 
     id = db.Column(db.Integer, primary_key=True)
-    deuda_id = db.Column(db.Integer, db.ForeignKey('deudas.id'), nullable=False)
+    socio_id = db.Column(db.Integer, db.ForeignKey('socio.id'), nullable=False)
     monto_pagado = db.Column(db.Float, nullable=False)
     fecha_pago = db.Column(db.Date, nullable=False, default=datetime.utcnow)
 
-    # Relación con la tabla Deuda
-    deuda = db.relationship('Deuda', backref=db.backref('historial_pagos', lazy=True))
+    socio = db.relationship('Socio', backref=db.backref('historial_pagos', lazy=True))
 
     def __init__(self, deuda_id, monto_pagado, fecha_pago):
         self.deuda_id = deuda_id

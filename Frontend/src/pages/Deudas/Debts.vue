@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import BasicButton from "../../components/BasicButton.vue";
 import BasicContainer from "../../components/BasicContainer.vue";
 import BasicToggle from "../../components/BasicToggle.vue";
@@ -8,6 +8,9 @@ import MayorContainer from "../../components/MayorContainer.vue";
 import DialogComponent from "../../components/DialogComponent.vue";
 import DialogContainer from "../../components/DialogContainer.vue";
 import { useMyToastStore } from "../../stores/Toast";
+import { getSocios } from "../../services/sociosServices";
+import { postDeuda } from "../../services/deudasServices";
+import { Deuda } from "../../types/deudaTypes";
 
 const optionSelected = ref(-1);
 
@@ -23,13 +26,39 @@ const handleOpen = (value: number) => {
   isOpen.value = !isOpen.value;
   dialogOptions.value = value;
 };
-
 // Mock data for members
-const members = ref([
-  { id: 1, name: "Juan Pérez", category: "Regular", debt: 250 },
-  { id: 2, name: "María Gómez", category: "Premium", debt: 350 },
-  { id: 3, name: "Carlos López", category: "Regular", debt: 150 },
-]);
+import type { SocioResponse } from "../../types/sociosTypes";
+
+const members = ref<SocioResponse[]>([]);
+
+onMounted(() => {
+  getSocios()
+    .then((response) => {
+      members.value = response;
+    })
+    .catch((error) => {
+      console.error("Error fetching socios:", error);
+    });
+});
+
+const deudaInput = ref<Deuda>({
+  fecha: "",
+  socio_id: 0,
+  monto: 0,
+  descripcion: "",
+});
+
+const handleCreateDebt = () => {
+  postDeuda(deudaInput.value)
+    .then(() => {
+      toastStore.showToast(500, "Deuda creada exitosamente", "check");
+      handleOpen(0);
+    })
+    .catch((error) => {
+      console.error("Error creating debt:", error);
+      toastStore.showToast(500, "Error al crear la deuda", "error");
+    });
+};
 
 // Mock data for debts
 const debts = ref([
@@ -57,11 +86,11 @@ const debts = ref([
 ]);
 
 const selectedMember = ref<null | {
+  nombre: string;
+  apellido: string;
   id: number;
-  name: string;
-  category: string;
-  debt: number;
 }>(null);
+
 const debtAmount = ref("");
 const debtConcept = ref("");
 const paymentAmount = ref("");
@@ -71,18 +100,20 @@ const searchTerm = ref("");
 const filteredMembers = ref([...members.value]);
 
 const handleSearch = () => {
+  console.log(1, searchTerm.value);
   if (!searchTerm.value) {
     filteredMembers.value = [...members.value];
     return;
   }
 
   filteredMembers.value = members.value.filter((member) =>
-    member.name.toLowerCase().includes(searchTerm.value.toLowerCase())
+    member.nombre.toLowerCase().includes(searchTerm.value.toLowerCase())
   );
 };
 
 const selectMember = (member) => {
   selectedMember.value = member;
+  deudaInput.value.socio_id = member.id;
   handleOpen(0); // Close the dialog
 };
 </script>
@@ -118,51 +149,31 @@ const selectMember = (member) => {
     <DialogComponent :is-open="isOpen" @close="handleOpen(0)">
       <DialogContainer title="Creación de Deuda" v-if="dialogOptions === 0">
         <div class="text-sm font-primary mt-2 space-y-2">
-          <div class="flex justify-between gap-2 mx-auto">
-            <input
-              type="date"
-              class="w-1/2 border border-black rounded-sm p-1"
-              placeholder="Fecha de Inicio"
-            />
-            <input
-              type="date"
-              class="w-1/2 border border-black rounded-sm p-1"
-              placeholder="Fecha de Fin"
-            />
-          </div>
           <input
-            class="p-2 border w-full border-black focus:scale-105 focus:outline-green-500 duration-150"
-            type="text"
-            placeholder="Categoria del Socio"
+            v-model="deudaInput.fecha"
+            type="date"
+            class="w-full border border-black rounded-sm p-1"
+            placeholder="Fecha de Inicio"
           />
 
           <input
-            v-model="debtAmount"
+            v-model="deudaInput.monto"
             class="p-2 border w-full border-black focus:scale-105 focus:outline-green-500 duration-150"
             type="number"
             placeholder="Monto de la Deuda"
           />
           <input
-            v-model="debtConcept"
+            v-model="deudaInput.descripcion"
             class="p-2 border w-full border-black focus:scale-105 focus:outline-green-500 duration-150"
             type="text"
             placeholder="Concepto de la Deuda"
           />
-          <select
-            class="p-2 border w-full border-black focus:scale-105 focus:outline-green-500 duration-150"
-          >
-            <option value="" disabled selected>Tipo de Deuda</option>
-            <option value="mensual">Cuota Mensual</option>
-            <option value="evento">Evento Especial</option>
-            <option value="multa">Multa</option>
-          </select>
 
           <BasicButton
             text="Crear Deuda"
             @click="
               () => {
-                toastStore.showToast(500, 'Deuda creada exitosamente', 'check');
-                handleOpen(0);
+                handleCreateDebt();
               }
             "
           />
@@ -170,31 +181,6 @@ const selectMember = (member) => {
       </DialogContainer>
       <DialogContainer title="Saldar Deuda" v-else-if="dialogOptions === 1">
         <div class="text-sm font-primary mt-2 space-y-2">
-          <p class="font-semibold text-base">Deudas Pendientes</p>
-
-          <div class="max-h-40 overflow-y-auto border border-black">
-            <table class="font-primary font-light w-full">
-              <thead class="bg-green-400 text-white sticky top-0">
-                <tr class="border-black border">
-                  <th class="border-black border p-2">Concepto</th>
-                  <th class="border-black border p-2">Monto</th>
-                  <th class="border-black border p-2">Fecha</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white text-black">
-                <tr
-                  v-for="debt in debts"
-                  :key="debt.id"
-                  class="hover:bg-green-100 duration-150 cursor-pointer"
-                >
-                  <td class="border-black border p-2">{{ debt.concept }}</td>
-                  <td class="border-black border p-2">S/. {{ debt.amount }}</td>
-                  <td class="border-black border p-2">{{ debt.date }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
           <input
             v-model="paymentAmount"
             class="p-2 border w-full border-black focus:scale-105 focus:outline-green-500 duration-150"
@@ -228,12 +214,12 @@ const selectMember = (member) => {
         <div class="text-sm font-primary mt-2 space-y-3">
           <div class="flex gap-2">
             <input
+              @change="handleSearch"
               v-model="searchTerm"
               class="p-2 border w-full border-black focus:scale-105 focus:outline-green-500 duration-150"
               type="text"
               placeholder="Buscar por nombre"
             />
-            <BasicButton text="Buscar" @click="handleSearch" />
           </div>
 
           <div class="max-h-40 overflow-y-auto border border-black">
@@ -241,20 +227,19 @@ const selectMember = (member) => {
               <thead class="bg-green-400 text-white sticky top-0">
                 <tr class="border-black border">
                   <th class="border-black border p-2">Nombre</th>
-                  <th class="border-black border p-2">Categoría</th>
-                  <th class="border-black border p-2">Deuda Total</th>
                 </tr>
               </thead>
+
               <tbody class="bg-white text-black">
                 <tr
                   v-for="member in filteredMembers"
-                  :key="member.id"
+                  :key="member.celular"
                   @click="selectMember(member)"
                   class="hover:bg-green-100 duration-150 cursor-pointer"
                 >
-                  <td class="border-black border p-2">{{ member.name }}</td>
-                  <td class="border-black border p-2">{{ member.category }}</td>
-                  <td class="border-black border p-2">S/. {{ member.debt }}</td>
+                  <td class="border-black border p-2">
+                    {{ member.nombre + " " + member.apellido }}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -265,9 +250,9 @@ const selectMember = (member) => {
             class="border border-green-400 p-2 rounded"
           >
             <p class="font-semibold">
-              Socio seleccionado: {{ selectedMember.name }}
+              Socio seleccionado:
+              {{ selectedMember.nombre + " " + selectedMember.apellido }}
             </p>
-            <p>Deuda total: S/. {{ selectedMember.debt }}</p>
           </div>
         </div>
       </DialogContainer>
